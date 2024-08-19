@@ -4,6 +4,7 @@ from ChessBoard import ChessBoard
 from constants import *
 from utils import *
 
+
 class ChessGame:
     def __init__(self):
         pygame.init()
@@ -17,8 +18,9 @@ class ChessGame:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_position = pygame.mouse.get_pos()
+                self.chess_board.process_click(mouse_position, self.turn)
 
         self.screen.fill((0, 0, 0))
         self.chess_board.update(self.screen)
