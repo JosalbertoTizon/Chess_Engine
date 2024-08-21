@@ -12,6 +12,7 @@ class ChessGame:
         self.chess_board = ChessBoard()
         # White pieces go first
         self.turn = Turn.WHITE
+        self.state = Game_State.CHOOSING_PIECE
 
     def step(self):
         for event in pygame.event.get():
@@ -20,8 +21,8 @@ class ChessGame:
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_position = pygame.mouse.get_pos()
-                self.chess_board.process_click(mouse_position, self.turn)
+                (self.state, self.turn) = self.chess_board.process_click(event.button, mouse_position, self.state, self.turn)
 
         self.screen.fill((0, 0, 0))
-        self.chess_board.update(self.screen)
+        self.chess_board.update(self.screen, self.state, self.turn)
         pygame.display.flip()
