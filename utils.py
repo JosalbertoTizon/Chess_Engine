@@ -31,8 +31,7 @@ class dotdict(dict):
 Colors = {
     "Dark_Green": pygame.Color(0, 100, 0),
     "Beige": pygame.Color(245, 245, 220),
-    "Glow_Green": pygame.Color(255, 204, 0, 200),
-    "Glow_Beige": pygame.Color(255, 204, 102, 200)
+    "Glow": pygame.Color(255, 204, 102, 200)
 }
 
 Colors = dotdict(Colors)

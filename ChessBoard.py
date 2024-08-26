@@ -160,10 +160,7 @@ class ChessBoard:
         if self.possible_moves is None:
             return
         for move in self.possible_moves:
-            if (move[0] + move[1]) % 2 == 0:
-                self.board_array[move[0]][move[1]].color = Colors.Glow_Green
-            else:
-                self.board_array[move[0]][move[1]].color = Colors.Glow_Beige
+            self.board_array[move[0]][move[1]].color = Colors.Glow
 
     def unglow(self):
         if self.possible_moves is None:

@@ -17,21 +17,12 @@ class ChessPiece(ABC):
     def get_valid_moves(self, chess_board):
         pass
 
-    def filter_non_empty_tile_moves(self, moves, chess_board):
+    def filter_valid_moves(self, moves, chess_board):
         valid_moves = []
         for move in moves:
             if chess_board.is_tile_empty(move):
                 valid_moves.append(move)
         return valid_moves
-
-    @abstractmethod
-    def enforce_additional_rules(self, moves, chess_board):
-        pass
-
-    def filter_valid_moves(self, moves, chess_board):
-        non_empty_tile_moves = self.filter_non_empty_tile_moves(moves, chess_board)
-        filtered_moves = self.enforce_additional_rules(non_empty_tile_moves, chess_board)
-        return filtered_moves
 
     def move(self, new_position):
         self.position = new_position
@@ -54,13 +45,15 @@ class Pawn(ChessPiece):
 
     def get_valid_moves(self, chess_board):
         front_direction = -1 if self.color == Piece_Color.WHITE else 1
-        moves = [(self.position[0], self.position[1] + 1 * front_direction)]
-        valid_moves = [move for move in moves if abs(move[0]) < 8 and abs(move[1]) < 8]
+        valid_moves = []
+        if 0 <= self.position[1] + 1 * front_direction < 8:
+            valid_moves.extend([(self.position[0], self.position[1] + 1 * front_direction)])
         filtered_moves = self.filter_valid_moves(valid_moves, chess_board)
         return filtered_moves
 
-    def enforce_additional_rules(self, moves, chess_board):
-        return moves
+    def filter_valid_moves(self, moves, chess_board):
+        return super().filter_valid_moves(moves, chess_board)
+        # No additional behavior needed
 
 
 class Rook(ChessPiece):
@@ -69,10 +62,40 @@ class Rook(ChessPiece):
         super().__init__(position, color, piece_type)
 
     def get_valid_moves(self, chess_board):
-        pass
+        valid_moves = []
+        valid_moves.extend([(i, self.position[1]) for i in range(8) if i != self.position[0]])
+        valid_moves.extend([(self.position[0], j) for j in range(8) if j != self.position[1]])
+        filtered_moves = self.filter_valid_moves(valid_moves, chess_board)
+        return filtered_moves
 
-    def enforce_additional_rules(self, moves, chess_board):
-        return True
+    def filter_valid_moves(self, moves, chess_board):
+        valid_moves = super().filter_valid_moves(moves, chess_board)
+        filtered_moves = []
+        for i in range(self.position[0] + 1, 8):
+            position = (i, self.position[1])
+            if position in valid_moves:
+                filtered_moves.append(position)
+            else:
+                break
+        for i in range(self.position[0] - 1, -8, -1):
+            position = (i, self.position[1])
+            if position in valid_moves:
+                filtered_moves.append(position)
+            else:
+                break
+        for j in range(self.position[1] + 1, 8):
+            position = (self.position[0], j)
+            if position in valid_moves:
+                filtered_moves.append(position)
+            else:
+                break
+        for j in range(self.position[1] - 1, -8, -1):
+            position = (self.position[0], j)
+            if position in valid_moves:
+                filtered_moves.append(position)
+            else:
+                break
+        return filtered_moves
 
 
 class Knight(ChessPiece):
@@ -81,10 +104,22 @@ class Knight(ChessPiece):
         super().__init__(position, color, piece_type)
 
     def get_valid_moves(self, chess_board):
-        pass
+        valid_moves = []
+        for delta_i in range(-2, 3):
+            if delta_i == 0:
+                continue
+            delta_j = 3 - abs(delta_i)
+            if 0 <= self.position[0] + delta_i < 8 and 0 <= self.position[1] + delta_j < 8:
+                valid_moves.extend([(self.position[0] + delta_i, self.position[1] + delta_j)])
+            delta_j = -3 + abs(delta_i)
+            if 0 <= self.position[0] + delta_i < 8 and 0 <= self.position[1] + delta_j < 8:
+                valid_moves.extend([(self.position[0] + delta_i, self.position[1] + delta_j)])
+        filtered_moves = self.filter_valid_moves(valid_moves, chess_board)
+        return filtered_moves
 
-    def enforce_additional_rules(self, moves, chess_board):
-        return True
+    def filter_valid_moves(self, moves, chess_board):
+        return super().filter_valid_moves(moves, chess_board)
+        # No additional behavior needed
 
 
 class Bishop(ChessPiece):
@@ -95,8 +130,8 @@ class Bishop(ChessPiece):
     def get_valid_moves(self, chess_board):
         pass
 
-    def enforce_additional_rules(self, moves, chess_board):
-        return True
+    def _enforce_additional_rules(self, moves, chess_board):
+        return moves
 
 
 class Queen(ChessPiece):
@@ -107,8 +142,8 @@ class Queen(ChessPiece):
     def get_valid_moves(self, chess_board):
         pass
 
-    def enforce_additional_rules(self, moves, chess_board):
-        return True
+    def _enforce_additional_rules(self, moves, chess_board):
+        return moves
 
 
 class King(ChessPiece):
@@ -119,5 +154,5 @@ class King(ChessPiece):
     def get_valid_moves(self, chess_board):
         pass
 
-    def enforce_additional_rules(self, moves, chess_board):
-        return True
+    def _enforce_additional_rules(self, moves, chess_board):
+        return moves
